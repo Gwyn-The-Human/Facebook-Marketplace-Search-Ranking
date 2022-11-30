@@ -1,5 +1,5 @@
 #image data
-images/*
+/images/
 cleaned_images/*
 /Images.csv
 /Products.csv
