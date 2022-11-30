@@ -1,6 +1,6 @@
 #image data
 /images/
-cleaned_images/*
+/cleaned_images/
 /Images.csv
 /Products.csv
 
