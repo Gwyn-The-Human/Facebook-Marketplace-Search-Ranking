@@ -14,7 +14,7 @@ def clean_image_data (images_path):
             os.makedirs ("cleaned_images")
     dirs = os.listdir(images_path)
     final_size = 512
-    for n, item in enumerate(dirs[:5], 1):
+    for n, item in enumerate(dirs[:5], 1): #doesnt clean all images btw! 
         print ("ID" + str (item))
         im = Image.open('images/' + item)
         new_im = resize_image(final_size, im)

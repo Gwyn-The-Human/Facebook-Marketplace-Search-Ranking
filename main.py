@@ -1,24 +1,37 @@
 from torch.utils.data import Dataset, DataLoader
-import torch
+import torch 
 import numpy as np
 import clean_images
+import clean_tabular_data
 import torchvision 
 import os
 from PIL import Image
+import pandas as pd
 
-
-
-   
+#makesure biases and weights tensors have requires_grad = true! 
 
 
 class ImageDataset (Dataset):
-        
     def __init__(self):
-        clean_images.clean_image_data("./images")
+        self.prod_data = clean_tabular_data.clean_table_data("Products.csv")
+        self.image_ids = pd.read_csv ("Images.csv")
+        self.merged_data = self.image_ids.merge(self.prod_data[['category','product_id']], on='product_id') #not all data is kept in the data!
         self.encoded_labels = {}
-        self.label_count = 0
-        self.data = self.images_to_tensors('./cleaned_images')
-        self.train_loader = DataLoader (self.data, batch_size=10, shuffle=True) #customise batch size
+        self.encode_labels (self.merged_data)
+        clean_images.clean_image_data("./images")
+        self.image_tensors = self.images_to_tensors('./cleaned_images')
+        print ("ENCODED LABELS ARE")
+        print (self.encoded_labels)
+        print ("MERGED DATA:")
+        print (self.merged_data)
+        print ("IMAGE TENSORS")
+        print (self.image_tensors)
+
+
+    def encode_labels(self, merged_data):
+        full_catagories = merged_data['category'].unique()
+        for cat in enumerate (full_catagories):
+            self.encoded_labels[cat[0]] = cat [1]
 
 
     def images_to_tensors (self, parent_dir):
@@ -28,25 +41,15 @@ class ImageDataset (Dataset):
             transform = torchvision.transforms.PILToTensor() 
             image_tensor = transform(PIL_image)
             tensor_list.append (image_tensor)
-            self.encode_label (image_label)
-        return torch.cat(tensor_list)    
-
-
-    def encode_label (self, image_label):
-        self.encoded_labels[self.label_count] = image_label
-        self.label_count += 1
+            # self.encode_label (image_label)
+        return torch.cat(tensor_list) # should this be a tuple? or whats the structure here, and where does the tuple go?    
 
 
     def decode_label(self, label_index):
         return self.encoded_labels[label_index]
-
-            #iterate through images and:
-                #clean them
-                #transform them into tensors
-                #save their labels
             
 
-    def __getitem__ (self,index):
+    def __getitem__ (self,index): # this is what should be returned by each batch; the label also, but I don't call this in the init? 
         """
         returns a tuple of features and labels; c
         """
@@ -58,33 +61,66 @@ class ImageDataset (Dataset):
     def __len__(self):
         return len (self.data)
 
-    def encode(self):
-        pass
 
-    def decode(self):
-        pass
+def train(model, epochs):
+    for epoch in range (epochs):
+        for batch in train_loader:
+            features = batch #in teh data set harry uses, this can be features, labels = batch; 
+#for mine, my dataset just has features i think. Update it so it does later, and just run like this now to see how it goes
+            prediction = model(features)
+            loss = torch.nn.functional.mse_loss (prediction, labels)
+            loss.backward()
+            print (loss)
+            #then optimise! 
 
 
-test = ImageDataset()
-
-print (test.encoded_labels)
-# print(next(iter(test.train_loader)))
 
 
+class Cnn(torch.nn.Module): 
+    def __init__(self):
+        #initialise parameters
+        super().__init__() # GIVE THIS A QUICK GOOGLE SO YOU MAKE SURE YOU UNDERSTAND IT!! 
+        self.layer1 = torch.nn.Linear(10, 1) #features, outputs; how do i check how many I need? Can i just run it? 
 
-# There are a few things to remember when you create the Dataset:
+    def forward (self,features): #replaces __call__  (this is inherited from the nn.module!)
+        return self.layer1(features)
 
-# The dataset should contain the images and the labels. 
-# You have two datasets, one for the images and one for the labels, so you should know what category correspond to what image.
-# 
-# You have to assign a label to each category, for example "Home & Garden" is category 0, "Appliances" is category 1, etc.
-#  This will be your encoder, which can be a dictionary. Thus, the output you obtain from the model
-#  will contain a list of numbers, which correspond to the categories, but you need to translate them. 
-# That way, in addition to creating the encoder, you should also create a decoder.
 
-# While not necessary, you can add image transformations to your dataset. For example, rotate the images or flip them horizontally.
-# This is called data augmentation.
 
-# A useful step here is to test that your DataLoader is working by running something like this:
+
+
+
+
+
+
+
+
+
+
+dataset = ImageDataset()
+train_loader = DataLoader(dataset.merged_data, batch_size=10, shuffle=True) #customise batch size; will be number of groups of outputs returned in one run
+model=Cnn()
+
+
+
+
+
+
+# bcount = 0
+# for batch in train_loader:
+#     bcount += 1
+#     for x in batch:
+#         print ("Printing things inside each batch")
+#         print (x)
+#     print ("ASSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSD")
+
+# print (bcount)
+
+# example = next(iter(train_loader))
+# a, b =example
+# print (a)
+# print (b)
+
+# print (train (model, 1))
 
 
