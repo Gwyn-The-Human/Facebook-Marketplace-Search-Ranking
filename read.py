@@ -19,7 +19,6 @@ encoded_labels = {}
 for cat in enumerate (full_catagories):
     encoded_labels[cat[0]] = cat [1]
 
-print (encoded_labels)
 
 
 

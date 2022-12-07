@@ -3,11 +3,6 @@ import os
 import pandas as pd
 import urllib.request
 
-# Create a pipeline that will apply the necessary cleaning to the image dataset by:
-#           defining a function called clean_image_data.
-# It should take in a filepath to the folder which contains the images, 
-# then clean them and save them into a new folder called "cleaned_images".
-#TEALKSHJDKLASDKLASJDKLAJSD
 
 def clean_image_data (images_path):
     if not os.path.exists ("cleaned_images"):
@@ -15,7 +10,7 @@ def clean_image_data (images_path):
     dirs = os.listdir(images_path)
     final_size = 512
     for n, item in enumerate(dirs[:5], 1): #doesnt clean all images btw! 
-        print ("ID" + str (item))
+        # print ("ID" + str (item))
         im = Image.open('images/' + item)
         new_im = resize_image(final_size, im)
         new_im.save(f'cleaned_images/{str(item)[:-4]}_resized.jpg')

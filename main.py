@@ -13,35 +13,46 @@ import pandas as pd
 
 class ImageDataset (Dataset):
     def __init__(self):
+       #clean and merge tabular data
         self.prod_data = clean_tabular_data.clean_table_data("Products.csv")
         self.image_ids = pd.read_csv ("Images.csv")
         self.merged_data = self.image_ids.merge(self.prod_data[['category','product_id']], on='product_id') #not all data is kept in the data!
+        
+        #encode labels
         self.encoded_labels = {}
         self.encode_labels (self.merged_data)
+
+        #clean images and convert to tensor
         clean_images.clean_image_data("./images")
         self.image_tensors = self.images_to_tensors('./cleaned_images')
-        print ("ENCODED LABELS ARE")
-        print (self.encoded_labels)
-        print ("MERGED DATA:")
-        print (self.merged_data)
-        print ("IMAGE TENSORS")
-        print (self.image_tensors)
+
+        self.features =   #just gotta work out how to do this! 
+        self.labels = 
+
+        #I guess ask yourself what happens when this dataset is called by the dataloader? 
+        # Does it search through batches using get item?; if not, at what point are these labels, features returned?
+        #and how are they linked/ related? 
 
 
     def encode_labels(self, merged_data):
         full_catagories = merged_data['category'].unique()
         for cat in enumerate (full_catagories):
-            self.encoded_labels[cat[0]] = cat [1]
+            self.encoded_labels[cat[1]] = cat [0]
+        # for label in merged_data['category']:
+        #     label = self.encoded_labels[label]
+        #     print (label)
+
+        # print (merged_data['category'])
+
 
 
     def images_to_tensors (self, parent_dir):
         tensor_list = []
-        for image_label in os.listdir(parent_dir):
-            PIL_image = Image.open(f"{parent_dir}/{image_label}")     
+        for image_id in os.listdir(parent_dir):
+            PIL_image = Image.open(f"{parent_dir}/{image_id}")     
             transform = torchvision.transforms.PILToTensor() 
             image_tensor = transform(PIL_image)
-            tensor_list.append (image_tensor)
-            # self.encode_label (image_label)
+            tensor_list.append(image_tensor)
         return torch.cat(tensor_list) # should this be a tuple? or whats the structure here, and where does the tuple go?    
 
 
@@ -53,20 +64,35 @@ class ImageDataset (Dataset):
         """
         returns a tuple of features and labels; c
         """
-        example = self.data.iloc[index]
-        features = example[:a] #which features /columns do I want to return?
-        label = example[b] #play around with what these return
+        print ("RUNNING GET ITEM!!!")
+        example = self.merged_data.iloc[index]
+        features = example['product_id'] #which features /columns do I want to return?
+        label = example['category'] #play around with what these return
         return (features, label)
 
     def __len__(self):
-        return len (self.data)
+        return len (self.merged_data)
+
+
+
+
+
+class Cnn(torch.nn.Module): 
+    def __init__(self):
+        #initialise parameters
+        super().__init__() # GIVE THIS A QUICK GOOGLE SO YOU MAKE SURE YOU UNDERSTAND IT!! 
+        self.layer1 = torch.nn.Linear(12604, 435) #features, outputs; how do i check how many I need? Can i just run it? 
+
+    def forward (self,features): #replaces __call__  (this is inherited from the nn.module!)
+        return self.layer1(features)
+
+
 
 
 def train(model, epochs):
     for epoch in range (epochs):
         for batch in train_loader:
-            features = batch #in teh data set harry uses, this can be features, labels = batch; 
-#for mine, my dataset just has features i think. Update it so it does later, and just run like this now to see how it goes
+            features, labels = batch  
             prediction = model(features)
             loss = torch.nn.functional.mse_loss (prediction, labels)
             loss.backward()
@@ -76,51 +102,34 @@ def train(model, epochs):
 
 
 
-class Cnn(torch.nn.Module): 
-    def __init__(self):
-        #initialise parameters
-        super().__init__() # GIVE THIS A QUICK GOOGLE SO YOU MAKE SURE YOU UNDERSTAND IT!! 
-        self.layer1 = torch.nn.Linear(10, 1) #features, outputs; how do i check how many I need? Can i just run it? 
-
-    def forward (self,features): #replaces __call__  (this is inherited from the nn.module!)
-        return self.layer1(features)
-
-
-
-
-
-
-
-
-
-
-
-
 
 dataset = ImageDataset()
-train_loader = DataLoader(dataset.merged_data, batch_size=10, shuffle=True) #customise batch size; will be number of groups of outputs returned in one run
-model=Cnn()
+batch_size = 10
+train_loader = DataLoader(dataset.image_tensors, batch_size=batch_size, shuffle=True) #customise batch size; will be number of groups of outputs returned in one run
+it = iter(train_loader)
+first = next(it) #error is here; for some reason My loader can't iterate through the data at all!
+# --> theres probably something wrong with DATASET
 
 
+example = next(iter(train_loader))
+print (example)
 
+# model=Cnn()
+# model(features)
+# train (model, 2)
 
+   #add image label to row
+            # real_id = image_id[:-12] #indexes out "_cleaned.jpeg"
+            # row = self.merged_data.loc[self.merged_data['id'] == real_id] #finds row related to image
+            # print ("ROW IS")
+            # print (row)
+            # category = row.iloc[0,3] #finds category of that row
+            # print (f"CAT IS {category}")
+            # label = self.encoded_labels[category] #encodes category to label
+            # print (f"LABEL IS {label}")
+            # element_list.append(torch.tensor([[[label]]]))
+            # print (len(element_list))
+            # tensor_list.append (torch.cat(element_list))
 
-
-# bcount = 0
-# for batch in train_loader:
-#     bcount += 1
-#     for x in batch:
-#         print ("Printing things inside each batch")
-#         print (x)
-#     print ("ASSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSD")
-
-# print (bcount)
-
-# example = next(iter(train_loader))
-# a, b =example
-# print (a)
-# print (b)
-
-# print (train (model, 1))
 
 
