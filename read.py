@@ -7,17 +7,23 @@ import os
 from PIL import Image
 import pandas as pd
 
-image_df = pd.read_csv ("Images.csv")
-prod_df = pd.read_csv ("Products.csv", lineterminator='\n')
 
-prod_df.rename(columns = {'id':'product_id'}, inplace = True)
-df = image_df.merge(prod_df[['category','product_id']], on= 'product_id')
-print (df.columns)
-full_catagories = df['category'].unique()
-encoded_labels = {}
+x = torch.tensor ([[1,2,3],[1,2,3],[1,2,3], [1,2,3]])
+print (x.shape)
+print(x.view (12,-1).shape)
+print(x.view (12,1).shape)
 
-for cat in enumerate (full_catagories):
-    encoded_labels[cat[0]] = cat [1]
+# image_df = pd.read_csv ("Images.csv")
+# prod_df = pd.read_csv ("Products.csv", lineterminator='\n')
+
+# prod_df.rename(columns = {'id':'product_id'}, inplace = True)
+# df = image_df.merge(prod_df[['category','product_id']], on= 'product_id')
+# print (df.columns)
+# full_catagories = df['category'].unique()
+# encoded_labels = {}
+
+# for cat in enumerate (full_catagories):
+#     encoded_labels[cat[0]] = cat [1]
 
 
 

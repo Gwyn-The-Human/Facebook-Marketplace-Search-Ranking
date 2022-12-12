@@ -7,7 +7,18 @@ import torchvision
 import os
 from PIL import Image
 import pandas as pd
+import random
+import NN
+from torch.utils.tensorboard import SummaryWriter
 
+SEED = (123)
+random.seed(SEED)
+np.random.seed(SEED)
+torch.manual_seed(SEED)
+torch.cuda.manual_seed(SEED)
+torch.backends.cudnn.deterministic = True
+
+#TODO normalise data?
 #TODO Make sure everything is tensors! 
 #TODO add rbg / greyscale in getitem w/inj dataset when relevant (see ivan's tips)
 #makesure biases and weights tensors have requires_grad = true! 
@@ -23,7 +34,7 @@ class ImageDataset (Dataset):
         self.image_ids = pd.read_csv ("Images.csv")
         self.merged_data = self.image_ids.merge(self.prod_data[['category','product_id']], on='product_id') #not all data is kept in the data!
         
-        #seets labels and image WHAT? 
+        #sets labels and image 
         self.labels = self.merged_data['category'].to_list()
         self.image_files = self.merged_data['id'].to_list()
 
@@ -32,7 +43,7 @@ class ImageDataset (Dataset):
         self.encode_labels (self.merged_data)
 
 
-    def encode_labels(self, merged_data):
+    def encode_labels(self, merged_data): #435 labels total
         full_catagories = merged_data['category'].unique()
         for cat in enumerate (full_catagories):
             self.encoded_labels[cat[1]] = cat [0]
@@ -43,7 +54,7 @@ class ImageDataset (Dataset):
     #     return self.encoded_labels[label_index]
             
 
-    def __getitem__ (self,index): # this is what should be returned by each batch; the label also, but I don't call this in the init? 
+    def __getitem__ (self,index): # this is what should be returned by each batch; the label also. 
         """
         returns a tuple of features and labels; c
         """
@@ -54,63 +65,55 @@ class ImageDataset (Dataset):
         PIL_image = Image.open(f"cleaned_images/{image}_resized.jpg")     
         transform = torchvision.transforms.PILToTensor() 
         feature = transform(PIL_image)
-        #features = # transform the image to a tensor
-        print (feature.shape)
+        feature = torch.flatten(feature).to(torch.float32)
+        # print (feature.shape)
+        # print ("LABEL IS")
+        # print (encoded_label)
         return feature, encoded_label
 
 
     def __len__(self):
         return len (self.merged_data)
 
+#input size should be just the size of the image; 
+#flatten the image (3d)
+#Go through my db and make sure I understand how I get the features of the shape that I have; then I need to make them 2 D
 
 
-
-
-class Cnn(torch.nn.Module): 
-    def __init__(self):
-        #initialise parameters
-        super().__init__() # GIVE THIS A QUICK GOOGLE SO YOU MAKE SURE YOU UNDERSTAND IT!! 
-        self.layer1 = torch.nn.Linear(1536, 1) #features, outputs; how do i check how many I need? Can i just run it? 
-        # self.layer2 = torch.nn.Linear(2000, 1000)
-        # self.layer3 = torch.nn.Linear(1000, 512)
-
-    def forward (self,features): #replaces __call__  (this is inherited from the nn.module!)
-        print ("FEATURES are")
-        print (features.shape)
-        return self.layer1(features)
-
-
-
-
-def train(model, epochs=10):
+def train(model, epochs=4):
+    optimiser = torch.optim.SGD(model.parameters(), lr=0.001)
+    batch_idx = 0
+    writer = SummaryWriter()
     for epoch in range (epochs):
         for batch in train_loader:
             features, labels = batch  #unpacks features and labels from the batch
-            prediction = model(features) #make a prediction with our model
-            loss = torch.nn.functional.mse_loss (prediction, labels) #calculates the loss of the model
+            prediction = model(features) #make a prediction with our model; currently is returning a tuple
+            labels = labels.unsqueeze(1).float()
+            loss = torch.nn.functional.mse_loss(prediction, labels) #calculates the loss of the model
             loss.backward()
-            print (loss)
+            print (loss.item())
+            writer.add_scalar('loss', loss.item(), batch_idx)
+            batch_idx += 1
             #then optimise! 
-
-
-
-
+            optimiser.step()
+            optimiser.zero_grad() #this reverts the grad value to zero so .backwards will overwright (otherwise it would just add to the grad val)
 
 dataset = ImageDataset()
-# print ("GOGOG GASDHET")
-# print(dataset[50])
-batch_size = 1
+batch_size = 100
 train_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True) #customise batch size; will be number of groups of outputs returned in one run
 
- #error is here; for some reason My loader can't iterate through the data at all!
-# --> theres probably something wrong with DATASET
+# example = next(iter(train_loader))
+# print (example)
 
-
-example = next(iter(train_loader))
-print (example)
-
-model=Cnn()
+model = NN.Cnn()
 train (model)
+
+
+
+
+
+
+
 
    #add image label to row
 
