@@ -17,11 +17,11 @@ class Cnn(torch.nn.Module):
     def __init__(self):
         #initialise parameters
         super().__init__()
-        self.layer1 = torch.nn.Linear(786432, 300000) #features, outputs; how do i check how many I need? Can i just run it? 
+        self.layer1 = torch.nn.Linear(786432, 250) #features, outputs; how do i check how many I need? Can i just run it? 
         #activation function
-        self.layer2 = torch.nn.Linear(300000, 50000)
-        self.layer3 = torch.nn.Linear(50000, 500)
-        self.layer4 = torch.nn.Linear(500,1)
+        self.layer2 = torch.nn.Linear(250, 200)
+        self.layer3 = torch.nn.Linear(200, 100)
+        self.layer4 = torch.nn.Linear(100,1)
 
     def forward (self,features): #replaces __call__  (this is inherited from the nn.module!)
         
