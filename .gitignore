@@ -3,6 +3,7 @@
 /cleaned_images/
 /Images.csv
 /Products.csv
+/model_evaluation/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
