@@ -3,20 +3,20 @@ from torch.utils.data import Dataset
 import clean_data
 import pandas as pd
 import torch 
-import torchvision 
 import torchvision.transforms as transforms
 
-
+#how can i split this into 
 
 
 class ImageDataset (Dataset):
     def __init__(self):
-
        #clean and merge tabular data
         self.prod_data = clean_data.clean_table_data("Products.csv")
         self.image_ids = pd.read_csv("Images.csv")
         self.merged_data = self.image_ids.merge(self.prod_data[['category','product_id']], on='product_id') 
+        self.merged_data = clean_data.drop_missing_ids(self.merged_data)
         
+
         #sets labels and image 
         self.labels = self.merged_data['category'].to_list()
         self.image_files = self.merged_data['id'].to_list()
@@ -28,6 +28,8 @@ class ImageDataset (Dataset):
 
     def encode_labels(self, merged_data): #435 labels total
         full_catagories = merged_data['category'].unique()
+        # print (full_catagories)
+        # print (len(full_catagories))
         for cat in enumerate (full_catagories):
             self.encoded_labels[cat[1]] = cat [0]
 
@@ -53,3 +55,11 @@ class ImageDataset (Dataset):
 
     def __len__(self):
         return len (self.merged_data)
+
+
+
+################################################################
+
+
+
+    

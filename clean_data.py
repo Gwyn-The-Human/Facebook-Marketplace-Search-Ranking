@@ -3,7 +3,7 @@ import os
 import pandas as pd
 
 
-final_size = 512
+final_size = 128
 
 
 def clean_image_data (images_path):   #used if you want to clean all the images in one go
@@ -32,8 +32,39 @@ def clean_table_data(csv):
     prod_df.rename(columns = {'id':'product_id'}, inplace = True)
     prod_df['price'] = prod_df['price'].str.strip('£')
     prod_df['price'] = prod_df['price'].str.strip(',')
+    prod_df['category'] = prod_df['category'].apply(simplify_category)
+    #print (prod_df['category'])
     return prod_df
 
 
+def simplify_category(cat):
+    #print (cat)
+    try:
+        cat = cat.split("/")
+        return cat[0]
+    except AttributeError:
+        return None
+ 
+
+def get_missing_image_ids(merged_data):
+  missing_ids = []
+  images = os.listdir("images")
+  prod_ids = merged_data #pd.read_csv("/content/drive/My Drive/Coding/Images.csv")
+  for ids in prod_ids['id']:
+    if f"{ids}.jpg" not in images:
+      missing_ids.append(f"{ids}")
+  return missing_ids
+
+
+def drop_missing_ids(merged_data):
+    missing_ids = get_missing_image_ids(merged_data)
+    for ids in missing_ids:
+        row = merged_data.loc[merged_data['id'] == ids]
+        index_to_drop = row.iloc[0,0]
+        merged_data = merged_data.drop(index_to_drop)
+    return merged_data
+
+
 if __name__ == '__main__':
-    clean_image_data ("images/")
+    # clean_image_data ("images/")
+    clean_table_data("Products.csv")

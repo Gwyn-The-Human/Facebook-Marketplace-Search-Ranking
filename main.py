@@ -1,4 +1,6 @@
 from datetime import datetime
+from sklearn.model_selection import train_test_split
+from torch.utils.data import Subset
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 import fb_dataset
@@ -6,41 +8,72 @@ import os
 import torch 
 import torch.nn as nn
 
-print (torch.cuda.is_available())
+
+
+
+
+
+#print (torch.cuda.is_available())
 
 
 #TODO add rbg / greyscale in getitem w/inj dataset when relevant (see ivan's tips)
 #makesure biases and weights tensors have requires_grad = true! 
 #TODO test label decoder
+#TODO Tasks  (just go thru from 4.5) 4.7, 4.9, 5.1
 
 
 class TunedResnet(nn.Module):
     def __init__(self):
         super().__init__()
         self.resnet50 = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_resnet50', pretrained=True)
-        self.resnet50.fc = nn.Linear(2048,435) 
+        self.resnet50.fc = nn.Linear(2048,13) 
         
 
     def forward(self, X):
         return self.resnet50(X)
 
 
+
+#train-test split function
+def train_test_datasets(dataset, val_split=0.2):
+    train_idx, val_idx = train_test_split(list(range(len(dataset))), test_size=val_split)
+    train_dataset =  Subset(dataset, train_idx)
+    test_dataset = Subset(dataset, val_idx)
+    return train_dataset, test_dataset
+
+
+
 #hyperparams 
 learning_rate = 0.01
-batch_size = 3
-num_epochs = 10
+batch_size = 128
+num_epochs = 5
+
 
 #variables 
 dataset = fb_dataset.ImageDataset()
 model = TunedResnet()
-train_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True) #customise batch size; will be number of groups of outputs returned in one run
+train_ds, test_ds = train_test_datasets(dataset)
+train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True) #customise batch size; will be number of groups of outputs returned in one run
 tt = iter(train_loader)
 optimiser = torch.optim.SGD(model.parameters(), lr=learning_rate)
 writer = SummaryWriter()
 
+
 #train/test split
-training_samples = 3360#3360 is 80 % total 4202 elements (len(train_model))
-testing_samples = 842 #842 is remaining 20%; this is where I split test and training data. 
+# def train_test_split(perc_test):
+#     total_batches = len(train_loader)
+#     test_samples = total_batches*perc_test/100
+#     test_samples = round(test_samples)
+#     train_samples= total_batches - test_samples
+#     return train_samples, test_samples
+
+# train_samples, test_samples = train_test_split (80)
+
+
+
+
+
+
 
 #training loop
 
@@ -54,8 +87,9 @@ def train(model):
     #train
     for epoch in range(num_epochs):
         print ("training")
-        batch = next(tt) #gives first iteration
-        while batch_id <= training_samples: # 80% of the total 4202 elements 
+        # batch = next(tt) #gives first iteration
+        # while batch_id <= train_samples: # 80% of the total 4202 elements 
+        for batch in train_loader:
             images, labels = batch
             print ("SHAPE IS ")
             print(images.shape)
@@ -81,7 +115,7 @@ def evaluation():
         num_correct = 0
         num_samples = 0
         batch = next(tt)
-        while batch_id <= testing_samples:
+        while batch_id <= test_samples:
             images, labels = batch
             outputs = model(images)
             _, predictions = torch.max(outputs, 1)
@@ -96,7 +130,33 @@ def evaluation():
 
 
 if __name__ == '__main__':
+
+
+
+    
+    
     train(model)
-    evaluation()
+    # evaluation()
 
 
+
+
+
+
+    
+    # print ("first three")
+    # tt = iter(train_loader)
+    # nxt = next (tt )
+    # print (nxt)
+    # nxt = next (tt )
+    # print (nxt)
+    # nxt = next (tt )
+
+    # print ("next three")
+    # tt = iter(train_loader)
+    # nxt = next (tt )
+    # print (nxt)
+    # nxt = next (tt )
+    # print (nxt)
+    # nxt = next (tt )
+    
