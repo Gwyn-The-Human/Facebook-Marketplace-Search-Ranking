@@ -23,3 +23,8 @@ For that reason I now need to edit the model from a classification model (betwee
 
 as a side note, this is AWESOME; that we can train the model with one set of catagories, and having learned from those, it is now able to tell us things about the images that are literally inarticulable to humans. WoWoWO!
 
+
+## FAISS
+
+Having extracted those features, I wrote a script to run the facebook AI similarity search on these features to find similar images. This was a really cool tool to learn about, and writing my own class to integrate the search into my own database and models I've made was a really great way to learn about what's happening under the hood. 
+The final result is the FaissSearch class, which takes TBT (make it so you can run the search in one line, all done in __init__?)

@@ -65,6 +65,10 @@ def drop_missing_ids(merged_data):
     return merged_data
 
 
+
+
+
+
 if __name__ == '__main__':
     # clean_image_data ("images/")
     clean_table_data("Products.csv")

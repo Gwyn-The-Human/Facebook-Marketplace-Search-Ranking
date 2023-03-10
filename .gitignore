@@ -5,6 +5,10 @@
 /Products.csv
 /model_evaluation/
 /runs/
+/image_embeddings.json
+/student.json
+/testo.py
+/testesto.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
