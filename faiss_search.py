@@ -33,22 +33,17 @@ class FaissSearch():
         return i
 
 
-    def decode_search_result(self, result): #test with multiple element vectors; gives a vector of positions THAT WAS A GOOD IDEA GWYNNO!
-        decoded_results = []
-        print ("result shape")
-        print (result)
-        for position in result:#position is a np ndarray with one thing in [position]
-            print ("Position is")
-            print (position.type)
-            result_vector = self.element_matrix[position]
-            for uuid, vector in self.embeddings.items(): #vector is a list, result_vector is an array
-                # print (len(vector))
-                # print (len(result_vector.tolist()))
-                # break
-                if result_vector.tolist() == vector: #if this works, might need to add a for x in resilt_vector or something because it might return multiple results
-                    decoded_results.append (uuid)
-                    #break # avoids duplicates in the images; do I want to do this
-        return decoded_results
+    def decode_search_result(self, result): 
+        decoded_results = [] # a list of lists of UUIDS of near images for each queried element
+        for queried_element in result: # result is an array of arrays, each which is the collection of nearest images for each element queried. 
+            uuids = [] #creates a list of UUIDS for each queried element, to be appended to the total decoded results
+            for position in queried_element:#position is a np ndarray with one thing in [position]
+                result_vector = self.element_matrix[position]
+                for uuid, vector in self.embeddings.items(): #vector is a list, result_vector is an array
+                    if result_vector.tolist() == vector[0]: #if this works, might need to add a for x in resilt_vector or something because it might return multiple results
+                        uuids.append (uuid)
+            decoded_results.append(uuids)
+        return decoded_results # a list of lists 
 
 if __name__ == '__main__':
     
@@ -61,22 +56,22 @@ if __name__ == '__main__':
         element = np.array(embeddings[uuid]).astype('float32')
         uuidx = uuid
         break
-    # for uuid in embeddings:
-    #     element2 = np.array(embeddings[uuid]).astype('float32')
+    for uuid in embeddings:
+         element2 = np.array(embeddings[uuid]).astype('float32')
     
-    #query = np.vstack((element, element2))
-    result = srch.search(element, 1)
+    query = np.vstack((element, element2))
+    result = srch.search(element, 2)
     final = srch.decode_search_result(result)
     
-    print (len(final))
+    print (final)
 
-# from PIL import Image
+from PIL import Image
+print (uuidx)
+searched = Image.open(f"images/{uuidx}")
+result = Image.open(f"images/{final[0][1]}")
  
-# searched = Image.open(f"images/{uuidx}")
-# result = Image.open(f"images/{final[5]}")
- 
-# searched.show()
-# result.show()
+searched.show()
+result.show()
 
 
 
