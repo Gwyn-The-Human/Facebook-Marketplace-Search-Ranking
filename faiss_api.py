@@ -1,12 +1,8 @@
 import uvicorn
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
 from PIL import Image
 from fastapi import UploadFile
-import torch
-import torch.nn as nn
-from pydantic import BaseModel
 from faiss_search import FaissSearch
 import image_processor
 import feature_extract            

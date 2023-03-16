@@ -1,0 +1,13 @@
+
+boto3 == 1.24.9
+faiss-cpu
+fastapi == 0.78.0
+numpy == 1.22.4
+pandas 
+Pillow == 9.1.1
+pydantic == 1.9.1
+python-multipart
+torch 
+torchvision
+transformers
+uvicorn == 0.17.6
