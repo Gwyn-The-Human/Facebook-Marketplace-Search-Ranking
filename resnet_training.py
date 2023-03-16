@@ -31,6 +31,12 @@ class TunedResnet(nn.Module):
 
     def forward(self, X):
         return self.resnet50(X)
+    
+
+    def predict(self, image):
+        with torch.no_grad():
+            x = self.forward(image)
+            return x
 
 
 #train-test split function

@@ -29,7 +29,7 @@ import resnet_training
 
 
 def load_extraction_model():        
-        model = resnet_training.model
+        model = resnet_training.TunedResnet()
         state_dict = torch.load("final_model/image_model.pt")
         model.load_state_dict(state_dict)
         model.resnet50.fc = nn.Linear(2048,1000)
@@ -46,20 +46,7 @@ def save_embeddings(image_dir):  #takes the directory within which you want to
             embedding = extract(image.float())
             image_embeddings[id] = embedding.tolist()
         json.dump(image_embeddings, fp)
-        print ("dumped")
-
-
-# def test_save_embeddings(image_dir):  #takes the directory within which you want to 
-#     extract = load_extraction_model()
-#     image_embeddings = {}
-#     with open("image_embeddings.json", "w") as fp:
-#         for id in os.listdir(image_dir):
-#             image = Image.open(f"{image_dir}/{id}")
-#             image = image_processor.proc_img(image)
-#             embedding = extract(image.float())
-#             image_embeddings[id] = str(embedding)
-#             json.dump(image_embeddings, fp)
-#             break
+        #print ("dumped")
 
 
         

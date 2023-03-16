@@ -13,6 +13,9 @@ Images are resized to all be the same size. Also renames id to product_id in the
 
 ## Desiging the model:
     
+talk about the GPU and trying the google gpu, then changing number of labels, and cleaning up some code --=> va bene!! 
+
+
 
 ## The Feature Extraction Model
 

@@ -2,6 +2,9 @@ import faiss
 import json
 import numpy as np
 
+
+#the search takes an array of embeddings(can be a single one in the array), and returns a list of lists
+# with the k specified nearest matches for each embedding in the array. 
 class FaissSearch():
     def __init__(self):
         with open("image_embeddings.json", 'r') as f:
@@ -14,9 +17,10 @@ class FaissSearch():
         count = 0 # for faster testing
         element_matrix = np.ndarray([0,1000]) # don't have to hard code this; could put embeddings.shape[1]
         for uuid in self.embeddings:
-            count += 1
+            
             element = np.array (self.embeddings[uuid])
             element_matrix = np.vstack((element, element_matrix))
+            count += 1
             if count == 100: #for faster testing
                  break
         return element_matrix.astype('float32')
@@ -47,6 +51,9 @@ class FaissSearch():
 
 if __name__ == '__main__':
     
+
+
+
 #testing search
     srch = FaissSearch() 
     uuidx = None   
@@ -61,17 +68,22 @@ if __name__ == '__main__':
     
     query = np.vstack((element, element2))
     result = srch.search(element, 2)
+    print (element.type) #n
+    print (len(query[0]))
     final = srch.decode_search_result(result)
     
     print (final)
 
-from PIL import Image
-print (uuidx)
-searched = Image.open(f"images/{uuidx}")
-result = Image.open(f"images/{final[0][1]}")
+# from PIL import Image
+# print (uuidx)
+# searched = Image.open(f"images/{uuidx}")
+# result = Image.open(f"images/{final[0][1]}")
  
-searched.show()
-result.show()
+# searched.show()
+# result.show()
+
+
+
 
 
 

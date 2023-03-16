@@ -5,7 +5,6 @@ import pandas as pd
 import torch 
 import torchvision.transforms as transforms
 
-#how can i split this into 
 
 
 class ImageDataset (Dataset):
@@ -16,7 +15,6 @@ class ImageDataset (Dataset):
         self.merged_data = self.image_ids.merge(self.prod_data[['category','product_id']], on='product_id') 
         self.merged_data = clean_data.drop_missing_ids(self.merged_data)
         
-
         #sets labels and image 
         self.labels = self.merged_data['category'].to_list()
         self.image_files = self.merged_data['id'].to_list()
@@ -26,7 +24,7 @@ class ImageDataset (Dataset):
         self.encode_labels(self.merged_data)
 
 
-    def encode_labels(self, merged_data): #435 labels total
+    def encode_labels(self, merged_data): #435 labels total previously, changed to 13 to speed up training. 
         full_catagories = merged_data['category'].unique()
         # print (full_catagories)
         # print (len(full_catagories))
@@ -55,11 +53,6 @@ class ImageDataset (Dataset):
 
     def __len__(self):
         return len (self.merged_data)
-
-
-
-################################################################
-
 
 
     
