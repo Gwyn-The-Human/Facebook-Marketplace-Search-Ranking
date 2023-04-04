@@ -9,20 +9,42 @@ import torch
 import torch.nn as nn
 
 
-#building the docker file we only the model, hence everything else is hashed out
+#building the docker file we only need the model, hence everything else is hashed out
 
 class TunedResnet(nn.Module):
     def __init__(self):
+        """
+        Loads the pretrained resnet50 model from torchhub and replaces the last layer with a linear layer
+        with 13 outputs.
+        """
         super().__init__()
         self.resnet50 = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_resnet50', pretrained=True)
         self.resnet50.fc = nn.Linear(2048,13) 
         
 
     def forward(self, X):
+        """
+        Takes in an image, and returns the activations of the last layer of the modified ResNet50
+        model
+        
+        Args:
+            X: input tensor of shape (N, C, H, W)
+
+        Returns: 
+            The output of the resnet50 model.
+        """
         return self.resnet50(X)
     
 
     def predict(self, image):
+        """
+        Takes an image as input, and returns the predicted class of that image
+        
+        Args:
+            image: the image to be classified
+        Returns:
+            The output of the forward pass of the model.
+        """
         with torch.no_grad():
             x = self.forward(image)
             return x
