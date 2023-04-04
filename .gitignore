@@ -5,6 +5,7 @@
 /Products.csv
 /model_evaluation/
 /runs/
+/app/image_embeddings.json
 /image_embeddings.json
 /student.json
 /testo.py

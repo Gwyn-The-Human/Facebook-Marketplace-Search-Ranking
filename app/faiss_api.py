@@ -18,6 +18,7 @@ except:
 api = FastAPI()
 print("Starting server")
 
+
 @api.get('/healthcheck')
 def healthcheck():
   msg = "API is up and running!"

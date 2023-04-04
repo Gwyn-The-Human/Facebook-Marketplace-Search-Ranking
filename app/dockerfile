@@ -19,4 +19,3 @@ EXPOSE 8080
 CMD ["python3", "faiss_api.py"]
 
 
-#dont use docker compose, just use docker build. can come back to back.

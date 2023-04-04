@@ -83,47 +83,5 @@ with the k specified nearest matches for each embedding in the array.
 if __name__ == '__main__':
     pass
 
-##testing search
-    # srch = FaissSearch() 
-    # uuidx = None   
-    # with open("image_embeddings.json", 'r') as f:
-    #     embeddings = json.load(f)
-    # for uuid in embeddings:
-    #     print ("Querying:")
-    #     print (uuid)
-    #     print ("------------------")
-    #     element = np.array(embeddings[uuid]).astype('float32')
-    #     uuidx = uuid
-    #     break
-    # for uuid in embeddings:
-    #      element2 = np.array(embeddings[uuid]).astype('float32')
-    
-    # query = np.vstack((element, element2))
-    # result = srch.search(element, 1)
-    # print (result)
-    # ###
-    # for x in result:
-    #     for y in x:
-    #         print ("list the embeddings then index the list")
-    #         print (srch.id_list[y])
-    # ###
-    # print ("search embeddings for tensor")
-    # final = srch.decode_search_result(result)
-    # print (final)
-    # ###
-    # print ("indexing imbedding")
-    # emb_indx = 0
-    # for embedding in srch.embeddings:
-    #     if emb_indx == 99:
-    #         print (embedding)
-    #     emb_indx += 1
-
-###three approaches: 
-#1. index the embeddings
-#2. list the embeddings and then index the list ()
-#3. search embeddings for tensor ()
-
-
-
 
 
